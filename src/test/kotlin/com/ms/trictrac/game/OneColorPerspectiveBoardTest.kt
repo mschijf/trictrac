@@ -44,9 +44,8 @@ internal class OneColorPerspectiveBoardTest {
 
     @Test
     fun generateMovesTest() {
-        val board = Board(
-            whiteBoardString = "0  | 4 0 0 4 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 | 7",
-            blackBoardString = "15 | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 | 0")
+        val board = Board(boardString = "0  | 4 0 0 4 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 | 7 \n" +
+                    "15 | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 | 0")
         val whiteBoard = board.boardWhite
         val moveList = whiteBoard.generateMoves(listOf(1,3))
         println(moveList)
@@ -54,9 +53,8 @@ internal class OneColorPerspectiveBoardTest {
 
     @Test
     fun generateMovesTest2() {
-        val board = Board(
-            whiteBoardString = "0  | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 1 1 0 | 13",
-            blackBoardString = "0  | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 1 0 0 | 14")
+        val board = Board(boardString = "0  | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 1 1 0 | 13 \n" +
+                "0  | 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 0 0 0 , 0 0 0 1 0 0 | 14")
         val whiteBoard = board.boardWhite
         val moveList = whiteBoard.generateMoves(listOf(1,1,2,2,5,5,6,6))
         println(moveList)

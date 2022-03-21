@@ -2,7 +2,7 @@ package com.ms.trictrac.game
 
 class OneColorPerspectiveBoard(
     private val color: Color,
-    inputString: String) {
+    inputString: String = "") {
 
     val quadrantList = buildList(QUADRANTS_PER_BOARD) {
         for (quadrantType in QuadrantType.values())
@@ -13,12 +13,14 @@ class OneColorPerspectiveBoard(
     val bearedOff = BearedOff(POINTS_PER_BOARD+1, 0, this)
 
     init {
-        val numberList = transformInputToIntList(inputString)
-        if (numberList.isEmpty())
-            throw Exception("worng format input String for board")
-        bar.initCheckers(numberList.first())
-        pointList.forEach { it.initCheckers(numberList[it.pointIndex+1]) }
-        bearedOff.initCheckers(numberList.last())
+        if (!inputString.isBlank()) {
+            val numberList = transformInputToIntList(inputString)
+            if (numberList.isEmpty())
+                throw Exception("wrong format input String for board")
+            bar.initCheckers(numberList.first())
+            pointList.forEach { it.initCheckers(numberList[it.pointIndex + 1]) }
+            bearedOff.initCheckers(numberList.last())
+        }
     }
 
     private fun transformInputToIntList(inputString: String): List<Int> {
