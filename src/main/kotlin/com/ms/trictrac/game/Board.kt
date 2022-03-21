@@ -25,10 +25,12 @@ class Board(boardString: String = DEFAULT_BOARD_STRING) {
         }
         boardWhite.pointList.forEach { it.setOpponentPoint(boardBlack.pointList[POINTS_PER_BOARD - it.pointIndex - 1]) }
         boardBlack.pointList.forEach { it.setOpponentPoint(boardWhite.pointList[POINTS_PER_BOARD - it.pointIndex - 1]) }
+        if (boardWhite.pointList.any { it.checkerCount > 0 && it.opponentPoint.checkerCount > 0 })
+            throw Exception("Both black and whit checkers on same Point")
     }
 
     override fun toString(): String {
-        return boardWhite.toString() + "\n" + boardBlack.toStringReversed()
+        return boardWhite.toString() + "\n" + boardBlack.toString()
     }
 
 }

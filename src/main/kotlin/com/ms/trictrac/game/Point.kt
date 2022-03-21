@@ -21,7 +21,7 @@ class Point(
         return true
     }
 
-    private lateinit var opponentPoint : Point
+    lateinit var opponentPoint : Point; private set
     fun setOpponentPoint(point: Point) {
         opponentPoint = point
     }

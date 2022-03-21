@@ -24,7 +24,7 @@ class OneColorPerspectiveBoard(
     }
 
     private fun transformInputToIntList(inputString: String): List<Int> {
-        val parts = inputString.split(' ', '|', ',').filter { it.isNotBlank() }
+        val parts = inputString.split(' ', '|', ',', ':').filter { it.isNotBlank() }
         if (parts.size != POINTS_PER_BOARD+2)
             return emptyList()
         val allNumbers = parts.mapNotNull { it.toIntOrNull() }
@@ -115,15 +115,9 @@ class OneColorPerspectiveBoard(
     //------------------------------------------------------------------------------------------------------------------
 
     override fun toString(): String {
-        var result = "%c %2d    ".format(color.letter, bar.checkerCount)
+        var result = "%2d |   ".format(bar.checkerCount)
         result += quadrantList.joinToString(separator = " : ") { it.toString() }
-        return "$result    %2d".format(bearedOff.checkerCount)
-    }
-
-    fun toStringReversed(): String {
-        var result = "%c %2d    ".format(color.letter, bearedOff.checkerCount)
-        result += quadrantList.reversed().joinToString(separator = " : ") { it.toStringReversed() }
-        return "$result    %2d".format(bar.checkerCount)
+        return "$result  |  %2d".format(bearedOff.checkerCount)
     }
 
 }
