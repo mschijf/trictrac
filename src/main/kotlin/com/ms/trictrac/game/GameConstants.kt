@@ -1,0 +1,7 @@
+package com.ms.trictrac.game
+
+const val QUADRANTS_PER_BOARD = 4
+const val POINTS_PER_QUADRANT = 6
+const val POINTS_PER_BOARD = QUADRANTS_PER_BOARD * POINTS_PER_QUADRANT
+const val MAX_CHECKERS_PER_POINT = 5
+const val MAX_CHECKERS_PER_GAME = 15

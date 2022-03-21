@@ -1,0 +1,34 @@
+package com.ms.trictrac.controller
+
+//import com.github.jknack.handlebars.Handlebars
+//import com.github.jknack.handlebars.Template
+//import com.github.jknack.handlebars.io.ClassPathTemplateLoader
+//import com.github.jknack.handlebars.io.TemplateLoader
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
+import java.io.File
+
+@RestController
+class TricTracHTMLController {
+
+    @GetMapping("/")
+    fun index(): String {
+//        val fileName = "src/main/resources/templates/backgammon.html"
+//        s = readFileUsingGetResource(fileName)
+//        val file = File(fileName)
+//        if (file.exists()) {
+//            return file.readText()
+//        } else {
+//            return "Cannot find '$fileName'."
+//        }
+        val fileName = "/templates/backgammon.html"
+        return readFileUsingGetResource(fileName)
+    }
+
+    fun readFileUsingGetResource(fileName: String): String {
+        val resource = this::class.java.getResource(fileName) ?: return "Cannot find file: '$fileName'"
+        return resource.readText(Charsets.UTF_8)
+    }
+}
+
+
