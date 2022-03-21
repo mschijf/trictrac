@@ -1,8 +1,9 @@
 package com.ms.trictrac.game
 
-class BearedOff(hashIndex: Int, initCheckers: Int, board: OneColorPerspectiveBoard): CheckerContainer(hashIndex, initCheckers, board) {
+class BearedOff(hashIndex: Int, board: Board): CheckerContainer(hashIndex, board) {
 
-    override fun isPlayable() = board.quadrantList.none { it.type != QuadrantType.HOME && it.hasCheckers() }
     override var name = "off"
-
+    override fun isPlayableFor(color: Color): Boolean {
+        return board.pointList.none { !it.inHomeQuandrant(color) && it.hasCheckers(color) }
+    }
 }

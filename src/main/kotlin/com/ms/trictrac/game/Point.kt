@@ -1,45 +1,32 @@
 package com.ms.trictrac.game
 
-class Point(
-    initCheckers: Int,
-    val pointIndex: Int,
-    private val quadrant: Quadrant,
-    board: OneColorPerspectiveBoard): CheckerContainer(pointIndex, initCheckers, board) {
+class Point(val pointIndex: Int, board: Board): CheckerContainer(pointIndex, board) {
 
-    override var name = "p%d".format(pointIndex+1)
+    override var name = "p${pointIndex+1}"
 
-    fun isBlunt() = checkerCount == 1
-    override fun isPlayable(): Boolean {
-        if (quadrant.type != QuadrantType.START && board.bar.hasCheckers())
+    override fun isPlayableFor(color: Color): Boolean {
+        if (!inStartQuadrant(color) && board.bar.hasCheckers(color))
             return false
-        if (checkerCount >= MAX_CHECKERS_PER_POINT)
+        if (checkerCount(color) >= MAX_CHECKERS_PER_POINT)
             return false
-        if (opponentPoint.checkerCount >= 2)
+        if (checkerCount(color.opponent()) >= 2)
             return false
-        if (quadrant.type == QuadrantType.HOME && board.getQuadrant(QuadrantType.START).hasCheckers())
+        if (inHomeQuandrant(color) && board.pointList.any { it.inStartQuadrant(color) && it.hasCheckers(color) } )
             return false
         return true
     }
 
-    lateinit var opponentPoint : Point; private set
-    fun setOpponentPoint(point: Point) {
-        opponentPoint = point
-    }
+    fun inHomeQuandrant(color: Color) = if (color == Color.WHITE) pointIndex > 17 else pointIndex < 6
+    fun inStartQuadrant(color: Color) = if (color == Color.WHITE) pointIndex < 6 else pointIndex > 17
 
-    fun isBluntByOpponent() = opponentPoint.isBlunt()
-    fun removeOpponentChecker() {
-        if (!isBluntByOpponent())
-            throw Exception("Try to remove an opponnent's stone, while it is not blunt")
-        opponentPoint.removeChecker()
-    }
-    fun addOpponentChecker() {
-        if (!opponentPoint.isEmpty())
-            throw Exception("Try to add an opponnent's stone, while it is not empty")
-        opponentPoint.addChecker()
-    }
+    fun isBlunt(color: Color) = checkerCount(color) == 1
 
     override fun toString(): String {
-        return "$checkerCount"
+        return if (checkerCount(Color.WHITE) > 0)
+            "${Color.WHITE.letter}${checkerCount(Color.WHITE)}"
+        else if (checkerCount(Color.BLACK) > 0)
+            "${Color.BLACK.letter}${checkerCount(Color.BLACK)}"
+        else
+            "0"
     }
-
 }

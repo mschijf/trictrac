@@ -3,12 +3,13 @@ package com.ms.trictrac.game
 import java.util.*
 
 class MovePart (
+    val color: Color,
     val from: CheckerContainer,
     val to: CheckerContainer,
     val isCapture: Boolean = false) {
 
-    val hashValue = Hash.move[from.hashIndex][from.checkerCount] xor
-            Hash.move[to.hashIndex][to.checkerCount+1] xor
+    val hashValue = Hash.move[from.hashIndex][from.checkerCount(color)] xor
+            Hash.move[to.hashIndex][to.checkerCount(color)+1] xor
             if (isCapture) Hash.capture[to.hashIndex] else 0L
 
     override fun toString() = "${from.name}-${to.name}${if(isCapture) "+" else ""}"

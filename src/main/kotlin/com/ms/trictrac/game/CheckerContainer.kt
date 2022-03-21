@@ -2,23 +2,30 @@ package com.ms.trictrac.game
 
 abstract class CheckerContainer(
     val hashIndex: Int,
-    initCheckers: Int,
-    protected val board: OneColorPerspectiveBoard) {
+    protected val board: Board) {
 
     abstract var name: String
-    var checkerCount = initCheckers; private set
-    fun hasCheckers() = checkerCount > 0
+    abstract fun isPlayableFor(color: Color): Boolean
 
-    fun initCheckers(initCheckerCount: Int) {
-        checkerCount = initCheckerCount
+    private val checkerCount = IntArray(2)
+
+    fun hasCheckers(color: Color) = checkerCount[color.ordinal] > 0
+    fun checkerCount(color: Color) = checkerCount[color.ordinal]
+
+    fun initCheckers(color: Color, initCheckerCount: Int) {
+        checkerCount[color.ordinal] = initCheckerCount
     }
 
-    fun addChecker() {
-        ++checkerCount
+    fun addChecker(color: Color) {
+        ++checkerCount[color.ordinal]
     }
-    fun removeChecker() {
-        --checkerCount
+    fun removeChecker(color: Color) {
+        --checkerCount[color.ordinal]
     }
-    fun isEmpty() = checkerCount == 0
-    abstract fun isPlayable(): Boolean
+    fun isEmpty(color: Color) = checkerCount[color.ordinal] == 0
+
+    override fun toString(): String {
+        return "${Color.WHITE.letter}$checkerCount[Color.WHITE.ordinal] ${Color.BLACK.letter}$checkerCount[Color.BLACK.ordinal]"
+    }
+
 }

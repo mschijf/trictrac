@@ -1,11 +1,11 @@
 package com.ms.trictrac.game
 
 enum class Color(val letter: Char) {
-    WHITE('W'){
-        override fun opponent() = Color.BLACK
+    WHITE('w'){
+        override fun opponent() = BLACK
     },
-    BLACK('B'){
-        override fun opponent() = Color.WHITE
+    BLACK('b'){
+        override fun opponent() = WHITE
     };
     abstract fun opponent(): Color
 }
