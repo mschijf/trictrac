@@ -1,16 +1,29 @@
     <script>
 
 
-      function drawBoard(board){
-        for (let i = 0; i < board.points.length; i++) {
-            drawPieces(i, "white", board.points[i].checkerCountWhite)
-            drawPieces(i, "black", board.points[i].checkerCountBlack)
+      function clearBoard(board){
+        const pieceDivs = document.querySelectorAll(".piece");
+        for (const piece of pieceDivs) {
+            piece.remove()
         }
-        drawPiecesOnBarBottom("white", board.bar.checkerCountWhite);
-        drawBearedOffPiecesBottom("white", board.bearedOff.checkerCountWhite)
+      };
 
-        drawPiecesOnBarTop("black", board.bar.checkerCountBlack);
-        drawBearedOffPiecesTop("black", board.bearedOff.checkerCountBlack)
+      function drawBoard(board){
+        clearBoard();
+        for (let i = 0; i < board.points.length; i++) {
+            if (board.whiteToMove) {
+                drawPieces(i, "black", board.points[i].name, 0, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].isPlayableBlack)
+                drawPieces(i, "white", board.points[i].name, -board.points[i].deltaBlack, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].isPlayableWhite)
+            } else {
+                drawPieces(i, "white", board.points[i].name, 0, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].isPlayableWhite)
+                drawPieces(i, "black", board.points[i].name, -board.points[i].deltaWhite, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].isPlayableBlack)
+            }
+        }
+        drawPiecesOnBarBottom("white", board.bar.name, board.bar.checkerCountWhite, board.bar.deltaWhite, board.bar.isPlayableWhite);
+        drawBearedOffPiecesTop("white", board.bearedOff.name, board.bearedOff.checkerCountWhite, board.bearedOff.isPlayableWhite);
+
+        drawPiecesOnBarTop("black", board.bar.name, board.bar.checkerCountBlack, board.bar.deltaBlack, board.bar.isPlayableBlack)
+        drawBearedOffPiecesBottom("black", board.bearedOff.name, board.bearedOff.checkerCountBlack, board.bearedOff.isPlayableBlack)
       };
 
       function opponentColor(color) {
@@ -19,66 +32,121 @@
         return "white"
       }
 
-      function drawPiece(left, top, color) {
+      function drawPiece(left, top, color, name, isPlayable, halfHidden, marker) {
             const newPiece = document.createElement("div")
             newPiece.classList.add("piece")
             newPiece.style.left = left
             newPiece.style.top = top
             newPiece.style.backgroundColor = color
             newPiece.style.borderColor = opponentColor(color)
+            if (halfHidden) {
+                newPiece.style.opacity = "0.5";
+            }
+
+            if (typeof marker !== "undefined") {
+	            const newText = document.createTextNode(marker.toString());
+    	        newPiece.appendChild(newText)
+        	    newPiece.style.color = opponentColor(color)
+            }
+
+            if (isPlayable) {
+            	newPiece.onclick = function() { executeMovePart(name) }
+                newPiece.style.cursor = "pointer"
+                newPiece.style.pointerEvents = 'auto';
+            } else {
+                newPiece.style.cursor = "default"
+                newPiece.style.pointerEvents = 'none';
+            }
+
             document.getElementById("board").appendChild(newPiece);
+            return newPiece
       }
 
-      function drawPieces(point, color, count){
-        if (point < 12)
-            leftRightPoint = 11 - point
+      function leftPos(pointIndex) {
+        if (pointIndex < 12)
+            leftRightPoint = 11 - pointIndex
         else
-            leftRightPoint = point - 12
+            leftRightPoint = pointIndex - 12
 
 
-        leftPosition = leftRightPoint*40+17;
+        leftPosition = leftRightPoint*40+16;
         if (leftRightPoint > 5) {
             leftPosition = leftPosition + 20 + 20 + 20 + 15
         }
+        return leftPosition + "px"
+      }
+
+      function topPos(pointIndex, count) {
+	      if (pointIndex < 12) {
+		      pos = 422 - (count * 38)
+	      } else {
+	      	  pos = (count * 38)
+	      }
+	      return pos + "px"
+      }
+
+      function drawPieces(point, color, name, start, count, delta, isPlayable){
+        leftPosition = leftPos(point)
         for (let i = 0; i < count; i++) {
-            if (point < 12) {
-                drawPiece(leftPosition.toString()+"px", 422 - (i * 38).toString()+"px", color)
-            } else {
-                drawPiece(leftPosition.toString()+"px", (i * 38).toString()+"px", color)
-            }
+        	topPosition = topPos(point, i+start)
+        	movedPiece = (delta > 0 && i >= count-delta)
+        	if (movedPiece) marker = "*" ; else marker = ""
+        	playableMarker = isPlayable && (i == count-1)
+        	drawPiece(leftPosition, topPosition, color, name, playableMarker, false, marker)
+        }
+        for (let i = 0; i < -delta; i++) {
+        	topPosition = topPos(point, count-delta-1+start)
+        	drawPiece(leftPosition, topPosition, color, name, false, true, "")
         }
       };
 
-      function drawPiecesOnBarTop(color, count){
+      function drawPiecesOnBarTop(color, name, count, delta, isPlayable){
         leftPosition = 6*40+20+17
         for (let i = 0; i < count; i++) {
-            drawPiece(leftPosition.toString()+"px", (10 + (i * 10)).toString() + "px", color)
+            playableMarker = isPlayable && (i == count-1)
+        	movedPiece = (delta > 0 && i >= count-delta)
+        	if (movedPiece) marker = "*" ; else marker = ""
+            drawPiece(leftPosition+"px", (10 + (i * 10))+"px", color, name, playableMarker, false, marker)
+        }
+        for (let i = 0; i < -delta; i++) {
+        	drawPiece(leftPosition+"px", (10 + ((count+i) * 10))+"px", color, name, false, true, "")
         }
       };
 
-      function drawPiecesOnBarBottom(color, count){
+      function drawPiecesOnBarBottom(color, name, count, delta, isPlayable){
         leftPosition = 6*40+20+17
         for (let i = 0; i < count; i++) {
-            drawPiece(leftPosition.toString()+"px", (412 - (i * 10)).toString() + "px", color)
+            playableMarker = isPlayable && (i == count-1)
+        	movedPiece = (delta > 0 && i >= count-delta)
+        	if (movedPiece) marker = "*" ; else marker = ""
+            drawPiece(leftPosition+"px", (412 - (i * 10))+"px", color, name, playableMarker, false, marker)
+        }
+        for (let i = 0; i < -delta; i++) {
+        	drawPiece(leftPosition+"px", (412 - ((count+i) * 10))+"px", color, name, false, true, "")
         }
       };
 
-      function drawBearedOffPiecesTop(color, count){
-        leftPosition = 580+20+17
+      function drawBearedOffPiecesTop(color, name, count, isPlayable){
+        leftPosition = 584+20+17
         for (let i = 0; i < count; i++) {
-            drawPiece(leftPosition.toString()+"px", (i * 10).toString() + "px", color)
+            playableMarker = isPlayable && (i == count-1)
+        	if (i == count-1) marker = count ; else marker = ""
+            drawPiece(leftPosition+"px", (i * 5)+"px", color, name, playableMarker, false, marker)
         }
       };
-      function drawBearedOffPiecesBottom(color, count){
-        leftPosition = 580+20+17
+
+      function drawBearedOffPiecesBottom(color, name, count, isPlayable){
+        leftPosition = 584+20+17
         for (let i = 0; i < count; i++) {
-            drawPiece(leftPosition.toString()+"px", (422 - (i * 10)).toString() + "px", color)
+            playableMarker = isPlayable && (i == count-1)
+        	if (i == count-1) marker = count ; else marker = ""
+            drawPiece(leftPosition+"px", (422 - (i * 5))+"px", color, name, playableMarker, false, marker)
         }
       };
 
       function getBoard() {
           var request = new XMLHttpRequest();
-
+            console.log('in getBoard')
           request.open("GET", "trictrac/api/v1/board/");
           request.onreadystatechange = function() {
               if(this.readyState === 4 && this.status === 200) {
@@ -89,6 +157,16 @@
           request.send();
       }
 
-      getBoard()
+        function executeMovePart(name) {
+            var request = new XMLHttpRequest();
+            request.open("POST", "trictrac/api/v1/move/" + name);
+            request.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    var board = JSON.parse(this.responseText);
+                    drawBoard(board);
+                }
+            };
+            request.send();
+        }
 
     </script>

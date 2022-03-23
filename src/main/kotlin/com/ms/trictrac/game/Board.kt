@@ -3,16 +3,30 @@ package com.ms.trictrac.game
 const val DEFAULT_BOARD_STRING = ""
 class Board(boardString: String = "") {
 
+    //todo: diceToBePlayed
+    //todo: movePartsPlayed
+    //todo: movePart stored with indexes instead of objects??
+
+    constructor(board: Board) : this(board.toString())
+
     val pointList = buildList(POINTS_PER_BOARD) {
         for (index in 0 until POINTS_PER_BOARD)
             add(Point(index, this@Board))
     }
     val bar = Bar(POINTS_PER_BOARD, this)
     val bearedOff = BearedOff(POINTS_PER_BOARD+1, this)
+    val colorToMove: Color
 
     init {
         if (boardString.isNotBlank()) {
-            val pairList = transformInputToIntList(boardString)
+            //format: w0-b9|w3-b2-w1-w4-b2-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|w7-b2@w
+            val split = boardString.split('@')
+            if (split.size > 2)
+                throw Exception("wrong format input String for board. Too many '@'")
+
+            colorToMove = if (split.size == 2) determineColorToMove(split[1]) else Color.WHITE
+            val pairList = transformInputToIntList(split[0])
+
             if (pairList.isEmpty())
                 throw Exception("wrong format input String for board")
 
@@ -27,6 +41,7 @@ class Board(boardString: String = "") {
             bearedOff.initCheckers(pairList[POINTS_PER_BOARD+2].first!!, pairList[POINTS_PER_BOARD+2].second)
             bearedOff.initCheckers(pairList[POINTS_PER_BOARD+3].first!!, pairList[POINTS_PER_BOARD+3].second)
         } else {
+            colorToMove = Color.WHITE
             bar.initCheckers(Color.WHITE, 15)
             bar.initCheckers(Color.BLACK, 15)
             pointList.forEach { it.initCheckers(Color.WHITE, 0); it.initCheckers(Color.BLACK, 0) }
@@ -35,8 +50,18 @@ class Board(boardString: String = "") {
         }
     }
 
+    private fun determineColorToMove(s: String): Color {
+        if (s.length != 1)
+            throw Exception("Unexpected serie of characters after '@'")
+        if (s[0].uppercaseChar() == 'W')
+            return Color.WHITE
+        if (s[0].uppercaseChar() == 'B')
+            return Color.BLACK
+        throw Exception("Unexpected character after '@'")
+    }
+
     private fun transformInputToIntList(inputString: String): List<Pair<Color?, Int>> {
-        val parts = inputString.split(' ', '|', ',', ':').filter { it.isNotBlank() }
+        val parts = inputString.split('|','-').filter { it.isNotBlank() }
         if (parts.size != POINTS_PER_BOARD+4)
             return emptyList()
 
@@ -100,7 +125,7 @@ class Board(boardString: String = "") {
     private fun getPossibleMoveParts(color: Color, dice: Int): List<MovePart> {
         if (bar.hasCheckers(color)) {
             return if (pointList[dice-1].isPlayableFor(color))
-                listOf(MovePart(color, bar, pointList[dice-1]))
+                listOf(MovePart(color, bar, pointList[dice-1], pointList[dice-1].isBlunt(color.opponent())))
             else
                 emptyList()
         }
@@ -117,20 +142,34 @@ class Board(boardString: String = "") {
             movePartList
     }
 
-    //------------------------------------------------------------------------------------------------------------------
-
-    private fun doMovePart(movePart: MovePart) {
-        movePart.from.removeChecker(movePart.color)
-        movePart.to.addChecker(movePart.color)
-        if (movePart.isCapture)
-            (movePart.to as Point).removeChecker(movePart.color.opponent())
+    fun getMovePart(checkerContainerName: String): MovePart {
+        val moves = generateMoves(Color.WHITE, listOf(2, 3))
+        val s = moves.map{ it.movePartList.first().from.name }
+        val x = s.first{ it == checkerContainerName}
+        val list = moves.filter{ it.movePartList.first().from.name == checkerContainerName }
+        return list.first().movePartList.first()
     }
 
-    private fun undoMovePart(movePart: MovePart) {
+    //------------------------------------------------------------------------------------------------------------------
+
+    //todo: (un)doMovePart is independent of board. Should it be a board Method?
+
+    fun doMovePart(movePart: MovePart) {
+        movePart.from.removeChecker(movePart.color)
+        movePart.to.addChecker(movePart.color)
+        if (movePart.isCapture) {
+            movePart.to.removeChecker(movePart.color.opponent())
+            bar.addChecker(movePart.color.opponent())
+        }
+    }
+
+    fun undoMovePart(movePart: MovePart) {
         movePart.to.removeChecker(movePart.color)
         movePart.from.addChecker(movePart.color)
-        if (movePart.isCapture)
-            (movePart.to as Point).addChecker(movePart.color.opponent())
+        if (movePart.isCapture) {
+            movePart.to.addChecker(movePart.color.opponent())
+            bar.removeChecker(movePart.color.opponent())
+        }
     }
 
     fun doMove(move: Move) {
@@ -139,9 +178,19 @@ class Board(boardString: String = "") {
 
     //------------------------------------------------------------------------------------------------------------------
 
-
     override fun toString(): String {
-        return "$bar | ${pointList.joinToString(separator = " , ") { it.toString() }} | $bearedOff"
+        return "$bar|${pointListToString()}|$bearedOff@${colorToMove.letter}"
+    }
+
+    private fun pointListToString(): String {
+        var s = ""
+        for (quadrant in 0 until 4) {
+            val subList = pointList.subList(quadrant* POINTS_PER_QUADRANT, (quadrant+1)* POINTS_PER_QUADRANT)
+            if (quadrant != 0)
+                s += "|"
+            s += subList.joinToString ("-"){ it.toString() }
+        }
+        return s
     }
 
 }

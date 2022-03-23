@@ -25,7 +25,7 @@ abstract class CheckerContainer(
     fun isEmpty(color: Color) = checkerCount[color.ordinal] == 0
 
     override fun toString(): String {
-        return "${Color.WHITE.letter}$checkerCount[Color.WHITE.ordinal] ${Color.BLACK.letter}$checkerCount[Color.BLACK.ordinal]"
+        return "${Color.WHITE.letter}${checkerCount(Color.WHITE)}-${Color.BLACK.letter}${checkerCount(Color.BLACK)}"
     }
 
 }

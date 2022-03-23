@@ -2,11 +2,54 @@ package com.ms.trictrac.controller
 
 import com.ms.trictrac.game.*
 
-class BoardModel(board: Board) {
-    val points = Array(POINTS_PER_BOARD) { i -> PointModel(board.pointList[i].checkerCount(Color.WHITE), board.pointList[i].checkerCount(Color.BLACK))}
-    val bar = PointModel(board.bar.checkerCount(Color.WHITE), board.bar.checkerCount(Color.BLACK))
-    val bearedOff = PointModel(board.bearedOff.checkerCount(Color.WHITE), board.bearedOff.checkerCount(Color.BLACK))
+class BoardModel(board: Board, movedPartList: List<MovePart>) {
+    val points : Array<PointModel>
+    val bar : PointModel
+    val bearedOff : PointModel
+    val whiteToMove: Boolean
 
-    class PointModel(val checkerCountWhite: Int, val checkerCountBlack: Int)
+    init {
+        whiteToMove = board.colorToMove == Color.WHITE
+        movedPartList.reversed().forEach { board.undoMovePart(it) }
+        val oldBoard = Board(board)
+        movedPartList.forEach { board.doMovePart(it) }
+
+        points = Array(POINTS_PER_BOARD) {i -> PointModel(
+            name = board.pointList[i].name,
+            checkerCountWhite = board.pointList[i].checkerCount(Color.WHITE),
+            checkerCountBlack = board.pointList[i].checkerCount(Color.BLACK),
+            deltaWhite = board.pointList[i].checkerCount(Color.WHITE) - oldBoard.pointList[i].checkerCount(Color.WHITE),
+            deltaBlack = board.pointList[i].checkerCount(Color.BLACK) - oldBoard.pointList[i].checkerCount(Color.BLACK),
+            isPlayableWhite = true,
+            isPlayableBlack = false)
+        }
+
+        bar = PointModel(
+            name = board.bar.name,
+            checkerCountWhite = board.bar.checkerCount(Color.WHITE),
+            checkerCountBlack = board.bar.checkerCount(Color.BLACK),
+            deltaWhite = board.bar.checkerCount(Color.WHITE) - oldBoard.bar.checkerCount(Color.WHITE),
+            deltaBlack = board.bar.checkerCount(Color.BLACK) - oldBoard.bar.checkerCount(Color.BLACK),
+            isPlayableWhite = true,
+            isPlayableBlack = false)
+
+        bearedOff = PointModel(
+            name = board.bearedOff.name,
+            checkerCountWhite = board.bearedOff.checkerCount(Color.WHITE),
+            checkerCountBlack = board.bearedOff.checkerCount(Color.BLACK),
+            deltaWhite = board.bearedOff.checkerCount(Color.WHITE) - oldBoard.bearedOff.checkerCount(Color.WHITE),
+            deltaBlack = board.bearedOff.checkerCount(Color.BLACK) - oldBoard.bearedOff.checkerCount(Color.BLACK),
+            isPlayableWhite = false,
+            isPlayableBlack = false)
+    }
+
+    class PointModel(
+        val name: String,
+        val checkerCountWhite: Int,
+        val checkerCountBlack: Int,
+        val deltaWhite: Int,
+        val deltaBlack: Int,
+        val isPlayableWhite: Boolean,
+        val isPlayableBlack: Boolean)
 }
 
