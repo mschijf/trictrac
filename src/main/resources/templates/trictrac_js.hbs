@@ -158,7 +158,6 @@
 
       function getBoard() {
           var request = new XMLHttpRequest();
-            console.log('in getBoard')
           request.open("GET", "trictrac/api/v1/board/");
           request.onreadystatechange = function() {
               if(this.readyState === 4 && this.status === 200) {
