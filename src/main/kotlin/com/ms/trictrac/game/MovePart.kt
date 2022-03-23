@@ -16,7 +16,7 @@ class MovePart (
 
     private object Hash {
         private val rnd = Random(0)
-        val move = Array(POINTS_PER_BOARD+2) { LongArray(MAX_CHECKERS_PER_GAME){rnd.nextLong()} }
+        val move = Array(POINTS_PER_BOARD+2) { LongArray(MAX_CHECKERS_PER_GAME+1){rnd.nextLong()} }
         val capture = LongArray(POINTS_PER_BOARD){ rnd.nextLong() }
     }
 }

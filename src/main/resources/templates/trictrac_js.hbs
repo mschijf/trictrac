@@ -20,10 +20,10 @@
             }
         }
         drawPiecesOnBarBottom("white", board.bar.name, board.bar.checkerCountWhite, board.bar.deltaWhite, board.bar.isPlayableWhite);
-        drawBearedOffPiecesTop("white", board.bearedOff.name, board.bearedOff.checkerCountWhite, board.bearedOff.isPlayableWhite);
+        drawBearedOffPiecesTop("white", board.bearedOff.name, board.bearedOff.checkerCountWhite, board.bearedOff.deltaWhite, board.bearedOff.isPlayableWhite);
 
         drawPiecesOnBarTop("black", board.bar.name, board.bar.checkerCountBlack, board.bar.deltaBlack, board.bar.isPlayableBlack)
-        drawBearedOffPiecesBottom("black", board.bearedOff.name, board.bearedOff.checkerCountBlack, board.bearedOff.isPlayableBlack)
+        drawBearedOffPiecesBottom("black", board.bearedOff.name, board.bearedOff.checkerCountBlack, board.bearedOff.deltaBlack, board.bearedOff.isPlayableBlack)
       };
 
       function opponentColor(color) {
@@ -126,16 +126,24 @@
         }
       };
 
-      function drawBearedOffPiecesTop(color, name, count, isPlayable){
+      function drawBearedOffPiecesTop(color, name, count, delta, isPlayable){
         leftPosition = 584+20+17
         for (let i = 0; i < count; i++) {
             playableMarker = isPlayable && (i == count-1)
-        	if (i == count-1) marker = count ; else marker = ""
+        	movedPiece = (delta > 0 && i >= count-delta)
+        	if (i == count-1)
+        	    if (movedPiece)
+        	        marker = count + "+"
+        	    else
+        	        marker = count
+        	else
+        	    marker = ""
+
             drawPiece(leftPosition+"px", (i * 5)+"px", color, name, playableMarker, false, marker)
         }
       };
 
-      function drawBearedOffPiecesBottom(color, name, count, isPlayable){
+      function drawBearedOffPiecesBottom(color, name, count, delta, isPlayable){
         leftPosition = 584+20+17
         for (let i = 0; i < count; i++) {
             playableMarker = isPlayable && (i == count-1)
