@@ -76,11 +76,15 @@
         return leftPosition + "px"
       }
 
-      function topPos(pointIndex, count) {
+      function topPos(pointIndex, count, startLower) {
 	      if (pointIndex < 12) {
 		      pos = 422 - (count * 38)
+		      if (startLower)
+		        pos = pos + 19
 	      } else {
 	      	  pos = (count * 38)
+		      if (startLower)
+		        pos = pos - 19
 	      }
 	      return pos + "px"
       }
@@ -88,14 +92,14 @@
       function drawPieces(point, color, name, start, count, delta, isPlayable){
         leftPosition = leftPos(point)
         for (let i = 0; i < count; i++) {
-        	topPosition = topPos(point, i+start)
+        	topPosition = topPos(point, i+start, delta > 0)
         	movedPiece = (delta > 0 && i >= count-delta)
         	if (movedPiece) marker = "*" ; else marker = ""
         	playableMarker = isPlayable && (i == count-1)
         	drawPiece(leftPosition, topPosition, color, name, playableMarker, false, marker)
         }
         for (let i = 0; i < -delta; i++) {
-        	topPosition = topPos(point, count-delta-1+start)
+        	topPosition = topPos(point, count-delta-1+start, false)
         	drawPiece(leftPosition, topPosition, color, name, false, true, "")
         }
       };
