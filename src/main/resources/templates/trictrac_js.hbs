@@ -12,11 +12,11 @@
         clearBoard();
         for (let i = 0; i < board.points.length; i++) {
             if (board.whiteToMove) {
-                drawPieces(i, "black", board.points[i].name, 0, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].isPlayableBlack)
-                drawPieces(i, "white", board.points[i].name, -board.points[i].deltaBlack, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].isPlayableWhite)
+                drawPieces(i, "black", board.points[i].name, 0, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].deltaWhite != 0, board.points[i].isPlayableBlack)
+                drawPieces(i, "white", board.points[i].name, -board.points[i].deltaBlack, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].deltaBlack != 0, board.points[i].isPlayableWhite)
             } else {
-                drawPieces(i, "white", board.points[i].name, 0, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].isPlayableWhite)
-                drawPieces(i, "black", board.points[i].name, -board.points[i].deltaWhite, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].isPlayableBlack)
+                drawPieces(i, "white", board.points[i].name, 0, board.points[i].checkerCountWhite, board.points[i].deltaWhite, board.points[i].deltaBlack != 0, board.points[i].isPlayableWhite)
+                drawPieces(i, "black", board.points[i].name, -board.points[i].deltaWhite, board.points[i].checkerCountBlack, board.points[i].deltaBlack, board.points[i].deltaWhite != 0, board.points[i].isPlayableBlack)
             }
         }
         drawPiecesOnBarBottom("white", board.bar.name, board.bar.checkerCountWhite, board.bar.deltaWhite, board.bar.isPlayableWhite);
@@ -89,10 +89,10 @@
 	      return pos + "px"
       }
 
-      function drawPieces(point, color, name, start, count, delta, isPlayable){
+      function drawPieces(point, color, name, start, count, delta, hasCapture, isPlayable){
         leftPosition = leftPos(point)
         for (let i = 0; i < count; i++) {
-        	topPosition = topPos(point, i+start, delta > 0)
+        	topPosition = topPos(point, i+start, hasCapture)
         	movedPiece = (delta > 0 && i >= count-delta)
         	if (movedPiece) marker = "*" ; else marker = ""
         	playableMarker = isPlayable && (i == count-1)

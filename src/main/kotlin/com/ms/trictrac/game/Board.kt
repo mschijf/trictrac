@@ -95,8 +95,8 @@ class Board(boardString: String = "") {
         return Color.values().firstOrNull{ it.letter.lowercaseChar() == letter.lowercaseChar()}
     }
 
-    fun generateMoves(color: Color, diceList: List<Int>): List<Move> {
-        val moveList = generateAllMoves(color, diceList)
+    fun generateMoves(diceList: List<Int>): List<Move> {
+        val moveList = generateAllMoves(diceList)
         return if (moveList.none { it.usedAllDice }) {
             moveList.distinctBy { it.hashValue }
         } else {
@@ -104,25 +104,26 @@ class Board(boardString: String = "") {
         }
     }
 
-    fun generateAllMoves(color: Color, diceList: List<Int>, moveBuilder: List<MovePart> = emptyList()): List<Move> {
+    fun generateAllMoves(diceList: List<Int>, moveBuilder: List<MovePart> = emptyList()): List<Move> {
         if (diceList.isEmpty()) {
             return listOf(Move(movePartList = moveBuilder, usedAllDice = true))
         }
 
-        val possibleMoveParts = getPossibleMoveParts(color, diceList.first())
+        val possibleMoveParts = getPossibleMoveParts(diceList.first())
         if (possibleMoveParts.isEmpty()) {
             return listOf(Move(movePartList = moveBuilder, usedAllDice = false))
         }
         val allMoves = mutableListOf<Move>()
         for (movePart in possibleMoveParts) {
             doMovePart(movePart)
-            allMoves += generateAllMoves(color, diceList.subList(fromIndex = 1, toIndex = diceList.size), moveBuilder.plus(movePart))
+            allMoves += generateAllMoves(diceList.subList(fromIndex = 1, toIndex = diceList.size), moveBuilder.plus(movePart))
             undoMovePart(movePart)
         }
         return allMoves
     }
 
-    private fun getPossibleMoveParts(color: Color, dice: Int): List<MovePart> {
+    private fun getPossibleMoveParts(dice: Int): List<MovePart> {
+        val color = colorToMove
         if (bar.hasCheckers(color)) {
             return if (pointList[dice-1].isPlayableFor(color))
                 listOf(MovePart(color, bar, pointList[dice-1], pointList[dice-1].isBlunt(color.opponent())))
@@ -143,7 +144,7 @@ class Board(boardString: String = "") {
     }
 
     fun getMovePart(checkerContainerName: String): MovePart {
-        val moves = generateMoves(Color.WHITE, listOf(2, 3))
+        val moves = generateMoves(listOf(2, 3))
         val s = moves.map{ it.movePartList.first().from.name }
         val x = s.first{ it == checkerContainerName}
         val list = moves.filter{ it.movePartList.first().from.name == checkerContainerName }
