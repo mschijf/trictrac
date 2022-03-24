@@ -33,6 +33,22 @@ class RestController @Autowired constructor(private val gameService: GameService
         return model
     }
 
+    @PostMapping("/undoMove/")
+    fun undoMove(httpServletResponse: HttpServletResponse,
+               @CookieValue(value = BOARD_COOKIE, defaultValue = DEFAULT_BOARD_STRING) boardString: String): BoardModel {
+        val (model, persistanceString) =  gameService.undoMovePart(boardString)
+        httpServletResponse.addCookie(getNewCookie(persistanceString))
+        return model
+    }
+
+    @GetMapping("/dices/")
+    fun getDices(httpServletResponse: HttpServletResponse,
+                 @CookieValue(value = BOARD_COOKIE, defaultValue = DEFAULT_BOARD_STRING) boardString: String): BoardModel {
+        val (model, persistanceString) = gameService.getDices(boardString)
+        httpServletResponse.addCookie(getNewCookie(persistanceString))
+        return model
+    }
+
     private fun getNewCookie(persistanceString: String): Cookie {
         val cookie = Cookie(BOARD_COOKIE, persistanceString)
         cookie.maxAge = 3600*24*365

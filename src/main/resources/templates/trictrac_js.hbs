@@ -1,6 +1,4 @@
-    <script>
-
-
+<script>
       function clearBoard(board){
         const pieceDivs = document.querySelectorAll(".piece");
         for (const piece of pieceDivs) {
@@ -24,6 +22,24 @@
 
         drawPiecesOnBarTop("black", board.bar.name, board.bar.checkerCountBlack, board.bar.deltaBlack, board.bar.isPlayableBlack)
         drawBearedOffPiecesBottom("black", board.bearedOff.name, board.bearedOff.checkerCountBlack, board.bearedOff.deltaBlack, board.bearedOff.isPlayableBlack)
+
+        drawDices(board.diceList, board.activeDiceIndex)
+      };
+
+      function drawDices(diceList, activeDiceIndex) {
+        for (let i = 0; i < diceList.length; i++) {
+            elem = document.getElementById("dice"+i);
+            elem.style.visibility = "initial";
+            elem.className = "dice dice-"+ diceList[i]
+            if (i == activeDiceIndex) {
+                elem.style.opacity = "1.0"
+            } else {
+                elem.style.opacity = "0.3"
+            }
+        }
+        for (let i = diceList.length; i < 8; i++) {
+            document.getElementById("dice"+i).style.visibility = "hidden";
+        }
       };
 
       function opponentColor(color) {
@@ -156,6 +172,8 @@
         }
       };
 
+{{!-- ------------------------------------------------------------------------------------------------------------- --}}
+
       function getBoard() {
           var request = new XMLHttpRequest();
           request.open("GET", "trictrac/api/v1/board/");
@@ -180,4 +198,28 @@
             request.send();
         }
 
-    </script>
+        function roleDice() {
+            var request = new XMLHttpRequest();
+            request.open("GET", "trictrac/api/v1/dices/");
+            request.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    var board = JSON.parse(this.responseText);
+                    drawBoard(board);
+                }
+            };
+            request.send();
+        }
+
+        function takeBack() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "trictrac/api/v1/undoMove/");
+            request.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    var board = JSON.parse(this.responseText);
+                    drawBoard(board);
+                }
+            };
+            request.send();
+        }
+
+</script>

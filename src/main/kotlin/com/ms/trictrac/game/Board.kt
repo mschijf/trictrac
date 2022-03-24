@@ -1,6 +1,10 @@
 package com.ms.trictrac.game
 
+import java.util.*
+
 const val DEFAULT_BOARD_STRING = ""
+private val random = Random()
+
 class Board(boardString: String = "") {
 
     //todo: diceToBePlayed
@@ -16,6 +20,9 @@ class Board(boardString: String = "") {
     val bar = Bar(POINTS_PER_BOARD, this)
     val bearedOff = BearedOff(POINTS_PER_BOARD+1, this)
     val colorToMove: Color
+    var diceValues = emptyList<Int>() ; private set
+    var activeDiceIndex = 0 ; private set
+    var movePartStack = Stack<MovePart>()
 
     init {
         if (boardString.isNotBlank()) {
@@ -95,6 +102,25 @@ class Board(boardString: String = "") {
         return Color.values().firstOrNull{ it.letter.lowercaseChar() == letter.lowercaseChar()}
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+
+    private fun roleDice() = 1 + random.nextInt(6)
+    fun roleDices() {
+        val dices = listOf (roleDice(), roleDice())
+
+        diceValues = if (dices[0] == dices[1]) {
+            listOf(dices[0], dices[0], 7-dices[0], 7-dices[0])
+        } else if ( (dices[0] * dices[1] == 2)) {
+            listOf(1,1,2,2,5,5,6,6)
+        } else {
+            dices.sorted()
+        }
+        activeDiceIndex = 0
+        movePartStack.clear()
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
     fun generateMoves(diceList: List<Int>): List<Move> {
         val moveList = generateAllMoves(diceList)
         return if (moveList.none { it.usedAllDice }) {
@@ -106,18 +132,24 @@ class Board(boardString: String = "") {
 
     fun generateAllMoves(diceList: List<Int>, moveBuilder: List<MovePart> = emptyList()): List<Move> {
         if (diceList.isEmpty()) {
-            return listOf(Move(movePartList = moveBuilder, usedAllDice = true))
+            return if (moveBuilder.isEmpty())
+                emptyList()
+            else
+                listOf(Move(movePartList = moveBuilder, usedAllDice = true))
         }
 
         val possibleMoveParts = getPossibleMoveParts(diceList.first())
         if (possibleMoveParts.isEmpty()) {
-            return listOf(Move(movePartList = moveBuilder, usedAllDice = false))
+            return if (moveBuilder.isEmpty())
+                emptyList()
+            else
+                listOf(Move(movePartList = moveBuilder, usedAllDice = false))
         }
         val allMoves = mutableListOf<Move>()
         for (movePart in possibleMoveParts) {
             doMovePart(movePart)
             allMoves += generateAllMoves(diceList.subList(fromIndex = 1, toIndex = diceList.size), moveBuilder.plus(movePart))
-            undoMovePart(movePart)
+            undoMovePart()
         }
         return allMoves
     }
@@ -144,9 +176,7 @@ class Board(boardString: String = "") {
     }
 
     fun getMovePart(checkerContainerName: String): MovePart {
-        val moves = generateMoves(listOf(2, 3))
-        val s = moves.map{ it.movePartList.first().from.name }
-        val x = s.first{ it == checkerContainerName}
+        val moves = generateMoves(diceValues.subList(activeDiceIndex, diceValues.size))
         val list = moves.filter{ it.movePartList.first().from.name == checkerContainerName }
         return list.first().movePartList.first()
     }
@@ -162,19 +192,23 @@ class Board(boardString: String = "") {
             movePart.to.removeChecker(movePart.color.opponent())
             bar.addChecker(movePart.color.opponent())
         }
+        activeDiceIndex++
+        movePartStack.push(movePart)
     }
 
-    fun undoMovePart(movePart: MovePart) {
+    fun undoMovePart() {
+        if (movePartStack.isEmpty()) {
+            println("Trying to do an undo with empty stack")
+            return
+        }
+        val movePart = movePartStack.pop()
+        activeDiceIndex--
         movePart.to.removeChecker(movePart.color)
         movePart.from.addChecker(movePart.color)
         if (movePart.isCapture) {
             movePart.to.addChecker(movePart.color.opponent())
             bar.removeChecker(movePart.color.opponent())
         }
-    }
-
-    fun doMove(move: Move) {
-        move.movePartList.forEach { doMovePart(it) }
     }
 
     //------------------------------------------------------------------------------------------------------------------
