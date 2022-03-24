@@ -18,8 +18,13 @@ class RestController @Autowired constructor(private val gameService: GameService
     @GetMapping("/board/")
     fun getBoard(httpServletResponse: HttpServletResponse,
                  @CookieValue(value = BOARD_COOKIE, defaultValue = DEFAULT_BOARD_STRING) boardString: String): BoardModel {
-//        val (model, _) = gameService.getBoard(boardString)
-        val (model, persistanceString) = gameService.getBoard(boardString)
+        val (model, _) = gameService.getBoard(boardString)
+        return model
+    }
+
+    @PostMapping("/board/")
+    fun getNewBoard(httpServletResponse: HttpServletResponse): BoardModel {
+        val (model, persistanceString) =  gameService.getNewBoard()
         httpServletResponse.addCookie(getNewCookie(persistanceString))
         return model
     }

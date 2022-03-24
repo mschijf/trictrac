@@ -2,22 +2,19 @@ package com.ms.trictrac.controller
 
 import com.ms.trictrac.game.*
 
-class BoardModel(board: Board, movedPartList: List<MovePart>) {
+//todo: remove delta fields
+class BoardModel(board: Board) {
     val points : Array<PointModel>
     val bar : PointModel
     val bearedOff : PointModel
     val whiteToMove: Boolean
     val diceList = board.diceValues
-    val activeDiceIndex = board.activeDiceIndex
+    val activeDiceIndex = board.activeDiceIndex()
     val takeBackPossible: Boolean
     val roleDicePossible: Boolean
 
     init {
         whiteToMove = board.colorToMove == Color.WHITE
-//        movedPartList.reversed().forEach { board.undoMovePart() }
-        val oldBoard = Board(board)
-//        movedPartList.forEach { board.doMovePart(it) }
-
         val moves = board.generateAllMoves(diceList.subList(activeDiceIndex, diceList.size))
         val playablePoints = if (moves.isEmpty()) emptyList() else moves.map{it.movePartList.first().from}
 
@@ -28,8 +25,8 @@ class BoardModel(board: Board, movedPartList: List<MovePart>) {
             name = board.pointList[i].name,
             checkerCountWhite = board.pointList[i].checkerCount(Color.WHITE),
             checkerCountBlack = board.pointList[i].checkerCount(Color.BLACK),
-            deltaWhite = board.pointList[i].checkerCount(Color.WHITE) - oldBoard.pointList[i].checkerCount(Color.WHITE),
-            deltaBlack = board.pointList[i].checkerCount(Color.BLACK) - oldBoard.pointList[i].checkerCount(Color.BLACK),
+            deltaWhite = 0,
+            deltaBlack = 0,
             isPlayableWhite = whiteToMove && playablePoints.any{it == board.pointList[i]},
             isPlayableBlack = !whiteToMove && playablePoints.any{it == board.pointList[i]})
         }
@@ -38,8 +35,8 @@ class BoardModel(board: Board, movedPartList: List<MovePart>) {
             name = board.bar.name,
             checkerCountWhite = board.bar.checkerCount(Color.WHITE),
             checkerCountBlack = board.bar.checkerCount(Color.BLACK),
-            deltaWhite = board.bar.checkerCount(Color.WHITE) - oldBoard.bar.checkerCount(Color.WHITE),
-            deltaBlack = board.bar.checkerCount(Color.BLACK) - oldBoard.bar.checkerCount(Color.BLACK),
+            deltaWhite = 0,
+            deltaBlack = 0,
             isPlayableWhite = whiteToMove && playablePoints.any{it == board.bar},
             isPlayableBlack = !whiteToMove && playablePoints.any{it == board.bar})
 
@@ -47,8 +44,8 @@ class BoardModel(board: Board, movedPartList: List<MovePart>) {
             name = board.bearedOff.name,
             checkerCountWhite = board.bearedOff.checkerCount(Color.WHITE),
             checkerCountBlack = board.bearedOff.checkerCount(Color.BLACK),
-            deltaWhite = board.bearedOff.checkerCount(Color.WHITE) - oldBoard.bearedOff.checkerCount(Color.WHITE),
-            deltaBlack = board.bearedOff.checkerCount(Color.BLACK) - oldBoard.bearedOff.checkerCount(Color.BLACK),
+            deltaWhite = 0,
+            deltaBlack = 0,
             isPlayableWhite = whiteToMove && playablePoints.any{it == board.bearedOff},
             isPlayableBlack = !whiteToMove && playablePoints.any{it == board.bearedOff})
     }

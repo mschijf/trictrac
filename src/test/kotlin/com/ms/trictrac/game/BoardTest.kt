@@ -38,19 +38,4 @@ internal class BoardTest {
     fun testLastTwo() {
         assertThrows<Exception> { Board("b15 w15|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0") }
     }
-
-    @Test
-    fun generateMovesTest() {
-        val board = Board(boardString = "w0-b15|w4-0-0-w4-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|w7-b0")
-        val moveList = board.generateAllMoves(listOf(1,3))
-        println(moveList)
-    }
-
-    @Test
-    fun generateMovesTest2() {
-        val board = Board(boardString = "w0-b0|0-0-b1-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-w1-w1-0|w13-b14@w")
-        val moveList = board.generateMoves(listOf(1,1,2,2,5,5,6,6))
-        println(moveList)
-    }
-
 }

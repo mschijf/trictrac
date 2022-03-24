@@ -13,6 +13,8 @@ class MovePart (
             if (isCapture) Hash.capture[to.hashIndex] else 0L
 
     override fun toString() = "${from.name}-${to.name}${if(isCapture) "+" else ""}"
+    fun toShortString() = "${from.name}${if (isCapture) "+" else ""}"
+
 
     private object Hash {
         private val rnd = Random(0)

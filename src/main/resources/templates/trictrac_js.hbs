@@ -25,6 +25,7 @@
 
         drawDices(board.diceList, board.activeDiceIndex)
         enableButtons(board)
+        showWhoIsToMove(board)
       };
 
       function drawDices(diceList, activeDiceIndex) {
@@ -46,6 +47,14 @@
       function enableButtons(board) {
         document.getElementById("buttonRoleDice").disabled = !board.roleDicePossible
         document.getElementById("buttonTakeBack").disabled = !board.takeBackPossible
+      }
+
+      function showWhoIsToMove(board) {
+        if (board.whiteToMove) {
+            document.getElementById("toMove").innerText = "White to move"
+        } else {
+            document.getElementById("toMove").innerText = "Black to move"
+        }
       }
 
       function opponentColor(color) {
