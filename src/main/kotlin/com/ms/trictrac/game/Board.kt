@@ -19,7 +19,7 @@ class Board(boardString: String = "") {
     }
     val bar = Bar(POINTS_PER_BOARD, this)
     val bearedOff = BearedOff(POINTS_PER_BOARD+1, this)
-    val colorToMove: Color
+    var colorToMove: Color; private set
     var diceValues = emptyList<Int>() ; private set
     var activeDiceIndex = 0 ; private set
     var movePartStack = Stack<MovePart>()
@@ -147,30 +147,35 @@ class Board(boardString: String = "") {
         }
         val allMoves = mutableListOf<Move>()
         for (movePart in possibleMoveParts) {
-            doMovePart(movePart)
+            doInternalMovePart(movePart)
             allMoves += generateAllMoves(diceList.subList(fromIndex = 1, toIndex = diceList.size), moveBuilder.plus(movePart))
-            undoMovePart()
+            undoInternalMovePart()
         }
         return allMoves
     }
 
+
     private fun getPossibleMoveParts(dice: Int): List<MovePart> {
         val color = colorToMove
         if (bar.hasCheckers(color)) {
-            return if (pointList[dice-1].isPlayableFor(color))
-                listOf(MovePart(color, bar, pointList[dice-1], pointList[dice-1].isBlunt(color.opponent())))
+            val pointIndex = if (color == Color.WHITE) dice-1 else (POINTS_PER_BOARD - dice)
+            return if (pointList[pointIndex].isPlayableFor(color))
+                listOf(MovePart(color, bar, pointList[pointIndex], pointList[pointIndex].isBlunt(color.opponent())))
             else
                 emptyList()
         }
 
+        val factor = if (color == Color.WHITE) 1 else -1
         val movePartList = pointList
             .filter { it.hasCheckers(color) }
-            .filter { it.pointIndex + dice < POINTS_PER_BOARD }
-            .filter { pointList[it.pointIndex+dice].isPlayableFor(color) }
-            .map { MovePart(color, it, pointList[it.pointIndex+dice], pointList[it.pointIndex+dice].isBlunt(color.opponent()) ) }
+            .filter { it.pointIndex + factor*dice < POINTS_PER_BOARD }
+            .filter { it.pointIndex + factor*dice >= 0 }
+            .filter { pointList[it.pointIndex+factor*dice].isPlayableFor(color) }
+            .map { MovePart(color, it, pointList[it.pointIndex+factor*dice], pointList[it.pointIndex+factor*dice].isBlunt(color.opponent()) ) }
 
-        return if (bearedOff.isPlayableFor(color) && pointList[POINTS_PER_BOARD-dice].hasCheckers(color))
-            movePartList.plus(MovePart(color, pointList[POINTS_PER_BOARD-dice], bearedOff))
+        val pointIndex = if (color == Color.WHITE) POINTS_PER_BOARD-dice else dice-1
+        return if (bearedOff.isPlayableFor(color) && pointList[pointIndex].hasCheckers(color))
+            movePartList.plus(MovePart(color, pointList[pointIndex], bearedOff))
         else
             movePartList
     }
@@ -185,15 +190,34 @@ class Board(boardString: String = "") {
 
     //todo: (un)doMovePart is independent of board. Should it be a board Method?
 
-    fun doMovePart(movePart: MovePart) {
+    private fun doInternalMovePart(movePart: MovePart) {
         movePart.from.removeChecker(movePart.color)
         movePart.to.addChecker(movePart.color)
         if (movePart.isCapture) {
             movePart.to.removeChecker(movePart.color.opponent())
             bar.addChecker(movePart.color.opponent())
         }
-        activeDiceIndex++
         movePartStack.push(movePart)
+    }
+
+    private fun undoInternalMovePart() {
+        val movePart = movePartStack.pop()
+        movePart.to.removeChecker(movePart.color)
+        movePart.from.addChecker(movePart.color)
+        if (movePart.isCapture) {
+            movePart.to.addChecker(movePart.color.opponent())
+            bar.removeChecker(movePart.color.opponent())
+        }
+    }
+
+    private fun endOfMove() = (activeDiceIndex >= diceValues.size || getPossibleMoveParts(diceValues[activeDiceIndex]).isEmpty())
+
+    fun doMovePart(movePart: MovePart) {
+        doInternalMovePart(movePart)
+        activeDiceIndex++
+        if (endOfMove() && diceValues.size == 2) {
+            colorToMove = colorToMove.opponent()
+        }
     }
 
     fun undoMovePart() {
@@ -201,14 +225,8 @@ class Board(boardString: String = "") {
             println("Trying to do an undo with empty stack")
             return
         }
-        val movePart = movePartStack.pop()
+        undoInternalMovePart()
         activeDiceIndex--
-        movePart.to.removeChecker(movePart.color)
-        movePart.from.addChecker(movePart.color)
-        if (movePart.isCapture) {
-            movePart.to.addChecker(movePart.color.opponent())
-            bar.removeChecker(movePart.color.opponent())
-        }
     }
 
     //------------------------------------------------------------------------------------------------------------------

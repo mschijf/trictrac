@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service
 class GameService {
 //    private var board = Board("w1-b9|w3-b1-b1-w4-b2-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|w7-b2@w")
 //
-    private var board = Board("w0-b11|0-b2-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-w2-w1-0-w2|w10-b2@w")
+//    private var board = Board("w0-b11|0-b2-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-w2-w1-0-w2|w10-b2@w")
+private var board = Board("")
 
     fun getBoard(boardString: String): Pair<BoardModel, String> {
 //        val tmp = "w1-b9|w3-b1-b1-w4-b2-0|0-0-0-0-0-0|0-0-0-0-0-0|0-0-0-0-0-0|w7-b2@w"

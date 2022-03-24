@@ -9,15 +9,20 @@ class BoardModel(board: Board, movedPartList: List<MovePart>) {
     val whiteToMove: Boolean
     val diceList = board.diceValues
     val activeDiceIndex = board.activeDiceIndex
+    val takeBackPossible: Boolean
+    val roleDicePossible: Boolean
 
     init {
         whiteToMove = board.colorToMove == Color.WHITE
-        movedPartList.reversed().forEach { board.undoMovePart() }
+//        movedPartList.reversed().forEach { board.undoMovePart() }
         val oldBoard = Board(board)
-        movedPartList.forEach { board.doMovePart(it) }
+//        movedPartList.forEach { board.doMovePart(it) }
 
-        val moves = board.generateMoves(diceList.subList(activeDiceIndex, diceList.size))
+        val moves = board.generateAllMoves(diceList.subList(activeDiceIndex, diceList.size))
         val playablePoints = if (moves.isEmpty()) emptyList() else moves.map{it.movePartList.first().from}
+
+        takeBackPossible = board.movePartStack.isNotEmpty()
+        roleDicePossible = moves.isEmpty()
 
         points = Array(POINTS_PER_BOARD) {i -> PointModel(
             name = board.pointList[i].name,

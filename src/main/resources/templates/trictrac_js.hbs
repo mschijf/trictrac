@@ -24,6 +24,7 @@
         drawBearedOffPiecesBottom("black", board.bearedOff.name, board.bearedOff.checkerCountBlack, board.bearedOff.deltaBlack, board.bearedOff.isPlayableBlack)
 
         drawDices(board.diceList, board.activeDiceIndex)
+        enableButtons(board)
       };
 
       function drawDices(diceList, activeDiceIndex) {
@@ -41,6 +42,11 @@
             document.getElementById("dice"+i).style.visibility = "hidden";
         }
       };
+
+      function enableButtons(board) {
+        document.getElementById("buttonRoleDice").disabled = !board.roleDicePossible
+        document.getElementById("buttonTakeBack").disabled = !board.takeBackPossible
+      }
 
       function opponentColor(color) {
         if (color == "white")
