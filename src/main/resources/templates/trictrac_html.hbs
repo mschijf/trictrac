@@ -1,3 +1,22 @@
+        <table>
+            <tr>
+                <td class="tableleft">
+                    <h1 id="toMove">White to move</h1>
+                </td>
+                <td class="tableleft" id="evaluationValue">
+                </td>
+                <td class="table-dice">
+                    <span class="dice dice-1" id="dice0" hidden></span>
+                    <span class="dice dice-1" id="dice1" hidden></span>
+                    <span class="dice dice-2" id="dice2" hidden></span>
+                    <span class="dice dice-3" id="dice3" hidden></span>
+                    <span class="dice dice-4" id="dice4" hidden></span>
+                    <span class="dice dice-5" id="dice5" hidden></span>
+                    <span class="dice dice-6" id="dice6" hidden></span>
+                    <span class="dice dice-1" id="dice7" hidden></span>
+                </td>
+            </tr>
+        </table>
         <div id="board" class = "board">
               <div class="left-bin">
                     <div class="top-row">
@@ -42,20 +61,18 @@
               </div>
               <div class = "right-bar"></div>
 
-              <div class = "dice-block">
-                    <button type="button" id="buttonRoleDice" onclick="roleDice()">Role the dice</button>
-                    <button type="button" id="buttonTakeBack" onclick="takeBack()">Take Back</button>
-                    <span class="dice dice-1" id="dice0" hidden></span>
-                    <span class="dice dice-1" id="dice1" hidden></span>
-                    <span class="dice dice-2" id="dice2" hidden></span>
-                    <span class="dice dice-3" id="dice3" hidden></span>
-                    <span class="dice dice-4" id="dice4" hidden></span>
-                    <span class="dice dice-5" id="dice5" hidden></span>
-                    <span class="dice dice-6" id="dice6" hidden></span>
-                    <span class="dice dice-1" id="dice7" hidden></span>
-              </div>
-              <div class = "info-block">
-                    <h1 id="toMove">White to move</h1>
+              <div class = "button-block">
+                <table>
+                    <tr>
+                        <td class="table-left">
+                            <button type="button" id="buttonTakeBack" onclick="takeBack()">Take Back</button>
+                            <button type="button" id="buttonNew" onclick="newBoard()">New</button>
+                        </td>
+                        <td class="table-right">
+                            <button type="button" id="buttonRoleDice" onclick="roleDice()">Role the dice</button>
+                        </td>
+                    </tr>
+                </table>
               </div>
         </div>
 

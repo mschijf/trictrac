@@ -74,13 +74,16 @@
                 newPiece.style.opacity = "0.5";
             }
 
-            if (typeof marker !== "undefined") {
+            if (typeof marker !== "undefined" && !isPlayable) {
 	            const newText = document.createTextNode(marker.toString());
     	        newPiece.appendChild(newText)
         	    newPiece.style.color = opponentColor(color)
             }
 
             if (isPlayable) {
+                const newText = document.createTextNode("p");
+                newPiece.appendChild(newText)
+                newPiece.style.color = opponentColor(color)
             	newPiece.onclick = function() { executeMovePart(name) }
                 newPiece.style.cursor = "pointer"
                 newPiece.style.pointerEvents = 'auto';
@@ -189,17 +192,29 @@
 
 {{!-- ------------------------------------------------------------------------------------------------------------- --}}
 
-      function getBoard() {
-          var request = new XMLHttpRequest();
-          request.open("GET", "trictrac/api/v1/board/");
-          request.onreadystatechange = function() {
-              if(this.readyState === 4 && this.status === 200) {
+        function getBoard() {
+            var request = new XMLHttpRequest();
+            request.open("GET", "trictrac/api/v1/board/");
+            request.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
                   var board = JSON.parse(this.responseText);
                   drawBoard(board);
-              }
-          };
-          request.send();
-      }
+                }
+            };
+            request.send();
+        }
+
+        function newBoard() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "trictrac/api/v1/board/");
+            request.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                  var board = JSON.parse(this.responseText);
+                  drawBoard(board);
+                }
+            };
+            request.send();
+        }
 
         function executeMovePart(name) {
             var request = new XMLHttpRequest();
